@@ -1,0 +1,45 @@
+PUENTE IA 3 — CÓMO PONER EN MARCHA LAS FUNCIONES REALES
+
+QUÉ ESTÁ PROGRAMADO
+- Buscar perfiles públicos en Roblox por palabra clave y ver avatar, nombre visible, @usuario y coincidencias de lo descargado. La búsqueda no es exhaustiva.
+- Seleccionar perfiles públicos sin afirmar que te pertenecen.
+- Vincular TU PROPIA cuenta con autorización oficial OAuth 2.0 de Roblox (scope openid profile). Cuenta 13+ y desarrollador con identidad verificada para registrar la app. Estado "identidad verificada" distinto de simple selección.
+- Chat de IA mediante API de OpenAI con clave de servidor y código de acceso, si lo configurás.
+- Compartir la página pública mediante enlace y código QR.
+- Enlaces a ChatGPT y Opera AI. No se conectan automáticamente ni controlan esas cuentas.
+
+QUÉ AÚN NO ESTÁ ACTIVO
+- No se publicó este Worker desde tu cuenta Cloudflare ni se probaron las APIs reales en producción.
+- No se registró tu aplicación OAuth de Roblox ni se incorporaron credenciales.
+- No hay acceso a datos privados, control remoto ni sesiones de ChatGPT u Opera AI. La vinculación a Roblox verifica identidad; no da control de terceros.
+
+PASO 1 — PUBLICAR EL BUSCADOR EN CLOUDFLARE WORKERS
+1. Instalá Node.js si hace falta (https://nodejs.org/)
+2. Descomprimí este ZIP y abrí una terminal en la carpeta Puente_IA_3, donde está wrangler.jsonc
+3. Ejecutá: npx wrangler login
+4. Ejecutá: npx wrangler deploy
+5. Abrí tu URL https://...workers.dev. Probá la búsqueda pública. La ruta /api/health debe mostrar ok=true. Si el buscador falla, revisá los mensajes de Cloudflare y las respuestas de Roblox.
+
+PASO 2 — VINCULAR TU PROPIA CUENTA ROBLOX (OPCIONAL)
+Roblox requiere que el desarrollador verifique identidad para registrar OAuth, y la cuenta que autoriza tenga 13 años o más. Creá una app OAuth en https://create.roblox.com/dashboard/credentials, tipo vinculación de cuentas, scopes openid y profile, y registrá exactamente:
+https://TU-WORKER.TU-SUBDOMINIO.workers.dev/api/roblox/auth/callback
+Configurá secretos desde la terminal, sin escribirlos nunca en el HTML:
+npx wrangler secret put ROBLOX_CLIENT_ID
+npx wrangler secret put ROBLOX_CLIENT_SECRET
+npx wrangler secret put AUTH_SESSION_SECRET
+El último valor debe ser ALEATORIO, de 32 caracteres como mínimo, y diferente de cualquier contraseña personal. La sesión firmada caduca en 12 horas y no guarda tokens de Roblox; para volver a conectarte se autoriza de nuevo.
+
+PASO 3 — ACTIVAR ASISTENTE OPENAI (OPCIONAL; API CON COSTOS)
+Conseguí una clave en https://platform.openai.com/ y establecé un presupuesto/límites. Guardala en Cloudflare:
+npx wrangler secret put OPENAI_API_KEY
+npx wrangler secret put APP_ACCESS_CODE
+El APP_ACCESS_CODE es un código secreto largo inventado para uso privado del chat; no lo compartas si la página es pública. La API no lee tus conversaciones de ChatGPT. Para público en general, sería necesario agregar sesiones propias, límites por usuario y protección contra abuso en lugar de compartir el código.
+
+REFERENCIAS OFICIALES
+https://developers.cloudflare.com/workers/static-assets/get-started/
+https://create.roblox.com/docs/cloud/auth/oauth2-overview
+https://create.roblox.com/docs/cloud/auth/oauth2-reference
+https://create.roblox.com/docs/cloud/reference/features/users
+https://developers.openai.com/siwc/website
+
+SEGURIDAD: Nunca pegues contraseñas, claves API, cookies o códigos de acceso en un chat o en un formulario de esta página. No uses nombres de perfiles ajenos como prueba de propiedad.
