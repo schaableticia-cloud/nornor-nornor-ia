@@ -1,0 +1,10 @@
+{
+  "name": "puente-ia-real",
+  "main": "index.js",
+  "compatibility_date": "2026-11-14",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
+  }
+}
